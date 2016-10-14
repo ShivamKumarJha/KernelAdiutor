@@ -95,7 +95,6 @@ import com.grarak.kerneladiutor.utils.kernel.wake.Wake;
 import com.grarak.kerneladiutor.utils.root.RootUtils;
 import com.grarak.kerneladiutor.utils.tools.Backup;
 import com.grarak.kerneladiutor.utils.tools.SupportedDownloads;
-import com.grarak.kerneladiutor.views.AdNativeExpress;
 
 import java.util.LinkedHashMap;
 
@@ -307,27 +306,6 @@ public class NavigationActivity extends BaseActivity
                 }
             });
             mPatchingThread.start();
-        }
-
-        if (!mFetchingAds && !Utils.DONATED) {
-            mFetchingAds = true;
-            mAdsFetcher = new WebpageReader(this, new WebpageReader.WebpageCallback() {
-                @Override
-                public void onCallback(String raw, CharSequence html) {
-                    if (raw == null || raw.isEmpty()) return;
-                    AdNativeExpress.GHAds ghAds = new AdNativeExpress.GHAds(raw);
-                    if (ghAds.readable()) {
-                        ghAds.cache(NavigationActivity.this);
-                        for (int id : sActualFragments.keySet()) {
-                            Fragment fragment = sActualFragments.get(id);
-                            if (fragment instanceof RecyclerViewFragment) {
-                                ((RecyclerViewFragment) fragment).ghAdReady();
-                            }
-                        }
-                    }
-                }
-            });
-            mAdsFetcher.execute(AdNativeExpress.ADS_FETCH);
         }
     }
 
