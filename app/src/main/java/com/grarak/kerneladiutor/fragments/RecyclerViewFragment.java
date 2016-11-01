@@ -137,6 +137,7 @@ public abstract class RecyclerViewFragment extends BaseFragment {
         mCirclePageIndicator = (CirclePageIndicator) mRootView.findViewById(R.id.indicator);
         resizeBanner();
         mViewPagerParent.setVisibility(View.INVISIBLE);
+        ViewUtils.dismissDialog(getChildFragmentManager());
 
         mProgress = mRootView.findViewById(R.id.progress);
 
@@ -418,7 +419,7 @@ public abstract class RecyclerViewFragment extends BaseFragment {
 
         @Override
         public int getCount() {
-            return mFragments.size();
+            return mFragments == null ? 0 : mFragments.size();
         }
     }
 
