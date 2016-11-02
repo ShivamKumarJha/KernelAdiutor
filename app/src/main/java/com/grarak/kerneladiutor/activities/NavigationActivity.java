@@ -507,13 +507,13 @@ public class NavigationActivity extends BaseActivity
             }
         }
         fragmentTransaction.commitAllowingStateLoss();
-        RootUtils.closeSU();
         if (mAdsFetcher != null) {
             mAdsFetcher.cancel();
         }
         if (mPatchingThread != null) {
             mPatchingThread.interrupt();
         }
+        RootUtils.closeSU();
     }
 
     @Override
