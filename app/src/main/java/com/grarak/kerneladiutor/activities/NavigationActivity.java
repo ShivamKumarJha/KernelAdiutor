@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -248,7 +249,7 @@ public class NavigationActivity extends BaseActivity
                 }
             }
         });
-        appendFragments();
+        appendFragments(false);
 
         if (savedInstanceState != null) {
             mSelection = savedInstanceState.getInt("selection");
@@ -271,7 +272,7 @@ public class NavigationActivity extends BaseActivity
         if (mSelection == 0 || !sActualFragments.containsKey(mSelection)) {
             mSelection = firstTab();
         }
-        onItemSelected(mSelection, false);
+        onItemSelected(mSelection, false, false);
 
         int result = Prefs.getInt("license", -1, this);
         int intentResult = getIntent().getIntExtra("result", -1);
@@ -347,6 +348,10 @@ public class NavigationActivity extends BaseActivity
     }
 
     public void appendFragments() {
+        appendFragments(true);
+    }
+
+    private void appendFragments(boolean setShortcuts) {
         sActualFragments.clear();
         Menu menu = mNavigationView.getMenu();
         menu.clear();
@@ -374,7 +379,9 @@ public class NavigationActivity extends BaseActivity
                 sActualFragments.put(id, fragment);
             }
         }
-        setShortcuts();
+        if (setShortcuts) {
+            setShortcuts();
+        }
     }
 
     private NavigationFragment getNavigationFragment(Fragment fragment) {
@@ -518,12 +525,12 @@ public class NavigationActivity extends BaseActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        onItemSelected(item.getItemId(), true);
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        onItemSelected(item.getItemId(), true, true);
         return true;
     }
 
-    private void onItemSelected(final int res, boolean delay) {
+    private void onItemSelected(final int res, boolean delay, boolean saveOpened) {
         mDrawer.closeDrawer(GravityCompat.START);
         getSupportActionBar().setTitle(getString(res));
         mNavigationView.setCheckedItem(res);
@@ -537,8 +544,10 @@ public class NavigationActivity extends BaseActivity
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment,
                 res + "_key").commit();
 
-        String openedName = fragment.getClass().getSimpleName() + "_opened";
-        Prefs.saveInt(openedName, Prefs.getInt(openedName, 0, this) + 1, this);
+        if (saveOpened) {
+            String openedName = fragment.getClass().getSimpleName() + "_opened";
+            Prefs.saveInt(openedName, Prefs.getInt(openedName, 0, this) + 1, this);
+        }
         setShortcuts();
     }
 
