@@ -320,6 +320,11 @@ public abstract class RecyclerViewFragment extends BaseFragment {
     }
 
     protected void postInit() {
+        if (getActivity() != null && isAdded()) {
+            for (RecyclerViewItem item : mItems) {
+                item.onRecyclerViewCreate(getActivity());
+            }
+        }
     }
 
     protected void adjustScrollPosition() {
