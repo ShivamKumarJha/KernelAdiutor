@@ -74,7 +74,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private static final String KEY_MATERIAL_ICON = "materialicon";
     private static final String KEY_BANNER_RESIZER = "banner_resizer";
     private static final String KEY_HIDE_BANNER = "hide_banner";
-    private static final String KEY_FORCE_CARDS = "forcecards";
     private static final String KEY_ACCENT_COLOR = "accent_color";
     private static final String KEY_SECTIONS_ICON = "section_icons";
     private static final String KEY_APPLY_ON_BOOT_TEST = "applyonboottest";
@@ -101,7 +100,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         super.onCreate(savedInstanceState);
         if (!Utils.DONATED) {
             Prefs.remove(KEY_HIDE_BANNER, getActivity());
-            Prefs.remove(KEY_FORCE_CARDS, getActivity());
             Prefs.remove(KEY_ACCENT_COLOR, getActivity());
             Prefs.remove(KEY_SECTIONS_ICON, getActivity());
         }
@@ -162,7 +160,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         findPreference(KEY_DARK_THEME).setOnPreferenceChangeListener(this);
         findPreference(KEY_BANNER_RESIZER).setOnPreferenceClickListener(this);
         findPreference(KEY_HIDE_BANNER).setOnPreferenceChangeListener(this);
-        findPreference(KEY_FORCE_CARDS).setOnPreferenceChangeListener(this);
         findPreference(KEY_ACCENT_COLOR).setOnPreferenceClickListener(this);
         findPreference(KEY_SECTIONS_ICON).setOnPreferenceChangeListener(this);
         findPreference(KEY_APPLY_ON_BOOT_TEST).setOnPreferenceClickListener(this);
@@ -226,7 +223,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 Utils.setStartActivity(checked, getActivity());
                 return true;
             case KEY_HIDE_BANNER:
-            case KEY_FORCE_CARDS:
                 if (!Utils.DONATED) {
                     ViewUtils.dialogDonate(getActivity()).show();
                     return false;
