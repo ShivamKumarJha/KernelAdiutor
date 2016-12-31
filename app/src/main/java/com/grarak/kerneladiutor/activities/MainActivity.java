@@ -61,6 +61,9 @@ import com.grarak.kerneladiutor.utils.kernel.wake.Wake;
 import com.grarak.kerneladiutor.utils.root.RootUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -318,27 +321,35 @@ public class MainActivity extends BaseActivity {
                 protected Boolean doInBackground(Void... params) {
                     if (mApplicationInfo != null && mPackageInfo != null
                             && mPackageInfo.versionCode == 130) {
-                        mPatched = !Utils.checkMD5("5c7a92a5b2dcec409035e1114e815b00",
-                                new File(mApplicationInfo.publicSourceDir))
-                                || Utils.isPatched(mApplicationInfo);
                         try {
-                            if (Utils.existFile(mApplicationInfo.dataDir + "/license")) {
-                                String content = Utils.readFile(mApplicationInfo.dataDir + "/license");
-                                if (!content.isEmpty() && (content = Utils.decodeString(content)) != null) {
-                                    if (content.equals(Utils.getAndroidId(MainActivity.this))) {
-                                        mLicensedCached = true;
-                                    }
-                                }
-                            }
-
-                            if (!mLicensedCached) {
-                                Process process = Runtime.getRuntime().exec("ping -W 5 -c 1 8.8.8.8");
-                                mInternetAvailable = process.waitFor() == 0;
-                                process.destroy();
-                            }
+                            mPatched = !Utils.checkMD5("5c7a92a5b2dcec409035e1114e815b00",
+                                    new File(mApplicationInfo.publicSourceDir))
+                                    || Utils.isPatched(mApplicationInfo);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        if (Utils.existFile(mApplicationInfo.dataDir + "/license")) {
+                            String content = Utils.readFile(mApplicationInfo.dataDir + "/license");
+                            if (!content.isEmpty() && (content = Utils.decodeString(content)) != null) {
+                                if (content.equals(Utils.getAndroidId(MainActivity.this))) {
+                                    mLicensedCached = true;
+                                }
+                            }
+                        }
+
+                        try {
+                            if (!mLicensedCached) {
+                                HttpURLConnection urlConnection = (HttpURLConnection) new URL("https://www.google.com").openConnection();
+                                urlConnection.setRequestProperty("User-Agent", "Test");
+                                urlConnection.setRequestProperty("Connection", "close");
+                                urlConnection.setConnectTimeout(3000);
+                                urlConnection.connect();
+                                mInternetAvailable = urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK;
+                            }
+                        } catch (IOException ignored) {
+                        }
+
                         return !mPatched;
                     }
                     return false;
