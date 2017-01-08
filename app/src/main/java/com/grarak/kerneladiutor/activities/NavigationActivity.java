@@ -84,7 +84,6 @@ import com.grarak.kerneladiutor.utils.Device;
 import com.grarak.kerneladiutor.utils.Prefs;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.ViewUtils;
-import com.grarak.kerneladiutor.utils.WebpageReader;
 import com.grarak.kerneladiutor.utils.kernel.cpuhotplug.Hotplug;
 import com.grarak.kerneladiutor.utils.kernel.cpuvoltage.Voltage;
 import com.grarak.kerneladiutor.utils.kernel.entropy.Entropy;
@@ -127,6 +126,8 @@ public class NavigationActivity extends BaseActivity
     private int mSelection;
     private boolean mLicenseDialog = true;
 
+    private boolean mAllowCommit;
+
     @Override
     protected boolean setStatusBarColor() {
         return false;
@@ -135,7 +136,7 @@ public class NavigationActivity extends BaseActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mAllowCommit = true;
         if (sFragments.size() <= 0) {
             new AsyncTask<Void, Void, Void>() {
                 @Override
@@ -479,6 +480,7 @@ public class NavigationActivity extends BaseActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        mAllowCommit = false;
         outState.putInt("selection", mSelection);
         outState.putBoolean("license", mLicenseDialog);
     }
@@ -500,14 +502,22 @@ public class NavigationActivity extends BaseActivity
         } else if (fragment instanceof SettingsFragment) {
             ((SettingsFragment) fragment).mDelay = delay;
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment,
-                res + "_key").commit();
+        if (mAllowCommit) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment,
+                    res + "_key").commit();
+        }
 
         if (saveOpened) {
             String openedName = fragment.getClass().getSimpleName() + "_opened";
             Prefs.saveInt(openedName, Prefs.getInt(openedName, 0, this) + 1, this);
         }
         setShortcuts();
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        mAllowCommit = true;
     }
 
     private Fragment getFragment(int res) {
