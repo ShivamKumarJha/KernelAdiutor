@@ -100,7 +100,6 @@ import com.grarak.kerneladiutor.utils.kernel.wake.Wake;
 import com.grarak.kerneladiutor.utils.root.RootUtils;
 import com.grarak.kerneladiutor.utils.tools.Backup;
 import com.grarak.kerneladiutor.utils.tools.SupportedDownloads;
-import com.grarak.kerneladiutor.views.AdNativeExpress;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -335,29 +334,6 @@ public class NavigationActivity extends BaseActivity
             startService(new Intent(this, Monitor.class));
         }
 
-        if (!mFetchingAds && !Utils.DONATED) {
-            mFetchingAds = true;
-            mAdsFetcher = new WebpageReader(this, new WebpageReader.WebpageListener() {
-                @Override
-                public void onSuccess(String url, String raw, CharSequence html) {
-                    AdNativeExpress.GHAds ghAds = new AdNativeExpress.GHAds(raw);
-                    if (ghAds.readable()) {
-                        ghAds.cache(NavigationActivity.this);
-                        for (int id : sActualFragments.keySet()) {
-                            Fragment fragment = sActualFragments.get(id);
-                            if (fragment instanceof RecyclerViewFragment) {
-                                ((RecyclerViewFragment) fragment).ghAdReady();
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(String url) {
-                }
-            });
-            mAdsFetcher.get(AdNativeExpress.ADS_FETCH);
-        }
     }
 
     private int firstTab() {
